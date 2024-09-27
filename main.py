@@ -25,18 +25,27 @@ def load_existing_wallet():
     print("Loading existing wallet...")
     resp = requests.get(f"http://127.0.0.1:8000/prequantum/wallets/{creds['private_key']}/")
     resp = resp.json()
-    user = Wallet(resp.get("wallet_id"), creds["private_key"], creds["public_key"])
-    print(f"Wallet Info ~ Private key: \n{user.private_key}, Public Key: \n{user.public_key}")
+    user = Wallet(resp.get("name", "John Doe"), resp.get("wallet_id"), creds["private_key"], creds["public_key"])
+    print(f"Wallet Info ~ Private key: \n{user.private_key[:100]}...., Public Key: \n{user.public_key[:100]}....")
 
 
 def create_new_wallet():
     global user
+    user_name_prompt = [
+        {
+            "type": "input",
+            "name": "user_name",
+            "message": "Enter your name:",
+        }
+    ]
+    user_name_resp = prompt(user_name_prompt)
+    user_name = user_name_resp.get("user_name")
     # Create a new wallet
     print("Creating a new wallet...")
-    resp = requests.get("http://127.0.0.1:8000/prequantum/wallets/new/")
+    resp = requests.get(f"http://127.0.0.1:8000/prequantum/wallets/new/{user_name}/")
     resp = resp.json()
     print(resp.get("wallet_id"))
-    user = Wallet(resp.get("wallet_id"), resp.get("private_key"), resp.get("public_key"))
+    user = Wallet(resp.get("wallet_id"), user_name, resp.get("private_key"), resp.get("public_key"))
     print(f"Wallet Info ~ Private key: \n{user.private_key}, Public Key: \n{user.public_key}")
 
 
@@ -62,7 +71,7 @@ def make_transaction():
     ]
     trxn = prompt(transaction)
     user.make_transaction(trxn["recipient"], int(trxn["amount"]))
-    print(f"Transaction to {trxn['recipient']} for {trxn['amount']} added to pending transactions.")
+    # print(f"Transaction to {trxn['recipient']} for {trxn['amount']} added to pending transactions.")
 
 
 def display_pending_transactions():

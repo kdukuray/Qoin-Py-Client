@@ -258,7 +258,8 @@ class BlockChain:
 
 
 class Wallet:
-    def __init__(self, wallet_id, private_key="", public_key=""):
+    def __init__(self, wallet_id, name, private_key="", public_key=""):
+        self.name = name
         self.wallet_id = wallet_id
         if private_key and public_key:
             self.private_key = private_key
@@ -315,8 +316,6 @@ class Wallet:
 
     def sign_transaction(self, transaction: Transaction) -> bytes:
         """Generates transaction signature"""
-        print(self.private_key)
-        print(self.private_key.encode("utf-8"))
         transaction_signature = serialization.load_pem_private_key(self.private_key.encode("utf-8"), password=None)\
             .sign(bytes(transaction.trxn_hash, "utf-8"))
         return transaction_signature
